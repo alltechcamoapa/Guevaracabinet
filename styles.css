@@ -286,6 +286,7 @@ body {
 .form-select,
 .form-textarea {
   width: 100%;
+  text-transform: uppercase;
   background: var(--bg-input);
   border: 1px solid var(--border-color);
   color: var(--text-primary);

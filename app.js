@@ -70,7 +70,30 @@ window.generatePDFTemplate = (title, content) => {
 };
 
 const App = (() => {
+  const LICENSE_KEY = 'ALLTECH-GUEVARA-2026';
+
   const init = async () => {
+    // 0. Check License
+    const savedLicense = localStorage.getItem('appLicense');
+    if (savedLicense !== LICENSE_KEY && savedLicense !== btoa(LICENSE_KEY)) {
+      document.getElementById('activationOverlay').style.display = 'flex';
+      document.querySelector('.sidebar').style.display = 'none';
+      document.querySelector('.main-content').style.display = 'none';
+      document.querySelector('.bottom-nav').style.display = 'none';
+      return; // Stop initialization
+    }
+
+    // Hide activation screen if shown
+    const overlay = document.getElementById('activationOverlay');
+    if (overlay) overlay.style.display = 'none';
+
+    document.querySelector('.sidebar').style.display = 'flex';
+    document.querySelector('.main-content').style.display = 'flex';
+
+    if (window.innerWidth <= 768) {
+      document.querySelector('.bottom-nav').style.display = 'block';
+    }
+
     // 1. Initialize DB
     await DataService.init();
 
@@ -85,6 +108,16 @@ const App = (() => {
     // 4. Render Initial State
     renderSidebar();
     navigate('clientes'); // Default Module
+  };
+
+  const validateLicense = () => {
+    const input = document.getElementById('licenseInput').value.trim();
+    if (input === LICENSE_KEY || btoa(input) === btoa(LICENSE_KEY)) {
+      localStorage.setItem('appLicense', btoa(LICENSE_KEY));
+      window.location.reload();
+    } else {
+      document.getElementById('licenseError').style.display = 'block';
+    }
   };
 
   const modules = {
@@ -268,7 +301,8 @@ const App = (() => {
     navigate,
     refreshCurrentModule,
     showNotification,
-    applyTheme
+    applyTheme,
+    validateLicense
   };
 })();
 
@@ -282,4 +316,13 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(reg => console.log('PWA Service Worker registered!', reg))
       .catch(err => console.log('PWA Service Worker registration failed: ', err));
   }
+  // Force all text inputs to uppercase dynamically
+  document.addEventListener('input', (e) => {
+    if ((e.target.tagName === 'INPUT' && (e.target.type === 'text' || e.target.type === 'search')) || e.target.tagName === 'TEXTAREA') {
+      const start = e.target.selectionStart;
+      const end = e.target.selectionEnd;
+      e.target.value = e.target.value.toUpperCase();
+      e.target.setSelectionRange(start, end);
+    }
+  });
 });

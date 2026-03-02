@@ -29,6 +29,21 @@
 
 <body>
 
+  <!-- Activation Screen (Hidden when activated) -->
+  <div id="activationOverlay"
+    style="display: none; position: fixed; inset: 0; background: var(--bg-app); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; padding: 20px;">
+    <div class="card" style="max-width: 400px; width: 100%; text-align: center; padding: 30px;">
+      <h2 style="color: var(--primary); margin-bottom: 20px;">Activación del Sistema</h2>
+      <p style="color: var(--text-muted); margin-bottom: 20px; font-size: 0.9rem;">Por favor, ingrese su número de serie
+        (Licencia) para habilitar el uso del sistema Guevara Cabinet.</p>
+      <input type="text" id="licenseInput" class="form-input" placeholder="Ej: GC-2026-XXXX-XXXX"
+        style="margin-bottom: 20px; font-size: 1.1rem; text-align: center; font-family: monospace;">
+      <button class="btn btn--primary" style="width: 100%;" onclick="App.validateLicense()">Activar Sistema</button>
+      <div id="licenseError" style="color: var(--danger); margin-top: 15px; display: none; font-size: 0.85rem;">Número
+        de serie inválido. Contacte a Alltech.</div>
+    </div>
+  </div>
+
   <!-- Sidebar (Desktop and Mobile overlay) -->
   <aside class="sidebar">
     <!-- Populated by app.js -->
