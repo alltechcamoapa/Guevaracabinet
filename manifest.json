@@ -1,0 +1,18 @@
+{
+  "name": "Guevara Cabinet",
+  "short_name": "Guevara",
+  "description": "Aplicación de gestión de clientes, productos y proformas",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#0f172a",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3596/3596091.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

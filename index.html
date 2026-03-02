@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Guevara Cabinet - PWA</title>
+
+  <!-- SEO & PWA -->
+  <meta name="description" content="Sistema de gestión de clientes, productos y proformas para Guevara Cabinet.">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#1e293b">
+
+  <!-- Apple Touch Icons -->
+  <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/3596/3596091.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Guevara Cabinet">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="./styles.css">
+</head>
+
+<body>
+
+  <!-- Sidebar (Desktop and Mobile overlay) -->
+  <aside class="sidebar">
+    <!-- Populated by app.js -->
+  </aside>
+
+  <!-- Main Content Area -->
+  <main class="main-content">
+    <div class="mobile-top-bar" style="display: flex; margin-bottom: 20px; align-items: center;">
+      <button id="mobileMenuBtn" class="mobile-nav-toggle">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+      <h1 style="display: none;" class="mobile-only-title">Guevara Cabinet</h1>
+    </div>
+
+    <div id="appContent">
+      <!-- Active Module Content goes here -->
+    </div>
+  </main>
+
+  <!-- Bottom Navigation (Mobile & Tablet) -->
+  <nav class="bottom-nav">
+    <!-- Populated by app.js -->
+  </nav>
+
+  <!-- Core Scripts -->
+  <script src="./db.js"></script>
+
+  <!-- Modules -->
+  <script src="./clientes.js"></script>
+  <script src="./productos.js"></script>
+  <script src="./proformas.js"></script>
+  <script src="./facturas.js"></script>
+  <script src="./configuracion.js"></script>
+
+  <!-- Main App Application -->
+  <script src="./app.js"></script>
+
+  <style>
+    @media (max-width: 768px) {
+      .mobile-only-title {
+        display: block !important;
+        font-size: 1.25rem;
+        margin-left: 10px;
+        color: var(--primary);
+      }
+    }
+  </style>
+</body>
+
+</html>
