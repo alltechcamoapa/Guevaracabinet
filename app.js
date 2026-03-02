@@ -69,6 +69,71 @@ window.generatePDFTemplate = (title, content) => {
   `;
 };
 
+window.exportAndSharePDF = async (title, contentHTML) => {
+  const fullHtml = window.generatePDFTemplate(title, contentHTML);
+  const isMobile = window.innerWidth <= 768;
+
+  const fallbackPrint = (html) => {
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(html);
+      printWindow.document.close();
+      printWindow.focus();
+      // setTimeout protects against blank prints in some browsers
+      setTimeout(() => { printWindow.print(); }, 250);
+    } else {
+      alert('Por favor permita las ventanas emergentes (pop-ups) para poder imprimir/compartir.');
+    }
+  };
+
+  if (isMobile && window.html2pdf) {
+    try {
+      if (typeof App !== 'undefined' && App.showNotification) {
+        App.showNotification('Generando Documento/PDF...', 'info');
+      }
+      const container = document.createElement('div');
+      container.innerHTML = fullHtml;
+
+      const sanitizedTitle = title.replace(/\s+/g, '_');
+      const filename = `${sanitizedTitle}.pdf`;
+
+      const pdfBlob = await html2pdf().set({
+        margin: [10, 10, 10, 10],
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      }).from(container).output('blob');
+
+      const file = new File([pdfBlob], filename, { type: 'application/pdf' });
+
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({
+          files: [file],
+          title: title,
+          text: `Documento: ${title}`
+        });
+      } else {
+        // Fallback to download on mobile if share is not available
+        const url = URL.createObjectURL(pdfBlob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      }
+    } catch (e) {
+      console.error('Error sharing PDF on mobile:', e);
+      fallbackPrint(fullHtml);
+    }
+  } else {
+    // Standard desktop print
+    fallbackPrint(fullHtml);
+  }
+};
+
 const App = (() => {
   const LICENSE_KEY = 'ALLTECH-GUEVARA-2026';
 

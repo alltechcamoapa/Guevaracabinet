@@ -368,11 +368,7 @@ const FacturasModule = (() => {
       </div>
     `;
 
-    const htmlContent = generatePDFTemplate('Factura', content);
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-    printWindow.print();
+    window.exportAndSharePDF(`Factura_FAC-${factura.numero}`, content);
   };
 
   const generateReporteCreadas = () => {
@@ -429,11 +425,7 @@ const FacturasModule = (() => {
       </div>
     `;
 
-    const htmlContent = generatePDFTemplate('Reporte Facturas Creadas', content);
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-    printWindow.print();
+    window.exportAndSharePDF('Reporte_Facturas_Creadas', content);
   };
 
   const generateReportePagos = () => {
@@ -508,11 +500,7 @@ const FacturasModule = (() => {
       </div>
     `;
 
-    const htmlContent = generatePDFTemplate('Reporte Pagos', content);
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-    printWindow.print();
+    window.exportAndSharePDF('Reporte_Pagos_Abonos', content);
   };
 
   // ========== EVENT HANDLERS ==========

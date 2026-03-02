@@ -669,11 +669,7 @@ const ProformasModule = (() => {
       </div>
     `;
 
-    const htmlContent = generatePDFTemplate('Proforma', content);
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-    printWindow.print();
+    window.exportAndSharePDF(`Proforma_PROF-${proforma.numero || proforma.numero_proforma || Date.now()}`, content);
   };
 
   const generateClienteReport = () => {
@@ -751,11 +747,7 @@ const ProformasModule = (() => {
       </div>
     `;
 
-    const htmlContent = generatePDFTemplate('Reporte por Cliente', content);
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-    printWindow.print();
+    window.exportAndSharePDF('Reporte_Proformas_por_Cliente', content);
     closeModal();
   };
 
@@ -835,11 +827,7 @@ const ProformasModule = (() => {
       </div>
     `;
 
-    const htmlContent = generatePDFTemplate('Reporte por Secuencia', content);
-    const printWindow = window.open('', '_blank');
-    printWindow.document.write(htmlContent);
-    printWindow.document.close();
-    printWindow.print();
+    window.exportAndSharePDF('Reporte_Proformas_por_Secuencia', content);
     closeModal();
   };
 
