@@ -52,16 +52,7 @@ const ConfiguracionModule = (() => {
               </div>
             </div>
 
-             <!-- Logo Reference -->
-            <div class="setting-row" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--spacing-md);">
-              <div>
-                <h4 style="color: var(--text-primary); margin-bottom: var(--spacing-xs);">Logotipo del Sistema</h4>
-                <p class="text-sm text-muted">Asegúrate de colocar tu imagen como <code>logo.png</code> en la raíz.</p>
-              </div>
-              <div style="background: white; padding: 10px; border-radius: 8px;">
-                <img src="./logo.png" alt="Logo preview" style="max-height: 80px; max-width: 150px; object-fit: contain;" onerror="this.src='https://ui-avatars.com/api/?name=GC&background=fff&color=3b82f6'">
-              </div>
-            </div>
+
 
             <!-- About / Copyright Section -->
             <div class="setting-row" style="margin-top: var(--spacing-xxl); padding-top: var(--spacing-xl); border-top: 1px solid var(--border-color); text-align: center;">

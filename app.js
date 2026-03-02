@@ -99,7 +99,24 @@ const App = (() => {
 
     // 2. Refresh dynamic State from configuration
     const config = DataService.getConfig();
-    State.set('companyConfig', { name: 'Guevara Cabinet', logoUrl: './logo.png' });
+    const basePath = window.location.href.split('index.html')[0].replace(/\/$/, "");
+    let finalLogoUrl = basePath + '/logo.png';
+
+    try {
+      const resp = await fetch(finalLogoUrl);
+      if (resp.ok) {
+        const blob = await resp.blob();
+        finalLogoUrl = await new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result);
+          reader.readAsDataURL(blob);
+        });
+      }
+    } catch (e) {
+      console.log('Could not convert logo to base64: ', e);
+    }
+
+    State.set('companyConfig', { name: 'Guevara Cabinet', logoUrl: finalLogoUrl });
     applyTheme(config.theme || 'dark');
 
     // 3. Setup Events

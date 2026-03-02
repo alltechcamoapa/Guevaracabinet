@@ -300,13 +300,14 @@ const FacturasModule = (() => {
     const subtotalValue = parseFloat(factura.subtotal) || 0;
     const totalValue = parseFloat(factura.total) || 0;
 
-    const companyConfig = State.get('companyConfig') || { name: 'Guevara Cabinet', logoUrl: 'logo.png' };
+    const companyConfig = State.get('companyConfig') || { name: 'Guevara Cabinet', logoUrl: '' };
     const content = `
       <div class="header">
         <div class="company-info">
           ${companyConfig.logoUrl ? `<img src="${companyConfig.logoUrl}" alt="Logo" style="max-height: 85px; margin-bottom: 5px;">` : ''}
           <h1>${companyConfig.name}</h1>
           <p>Factura Original</p>
+          <p>Cel: 8655-0650</p>
         </div>
         <div class="proforma-info">
           <h2>FACTURA</h2>
@@ -376,7 +377,7 @@ const FacturasModule = (() => {
 
   const generateReporteCreadas = () => {
     const facturas = DataService.getFacturasFiltered(filterState);
-    const companyConfig = State.get('companyConfig') || { name: 'Guevara Cabinet', logoUrl: 'logo.png' };
+    const companyConfig = State.get('companyConfig') || { name: 'Guevara Cabinet', logoUrl: '' };
 
     let totalFacturadoUSD = 0;
     let totalFacturadoNIO = 0;
@@ -437,7 +438,7 @@ const FacturasModule = (() => {
 
   const generateReportePagos = () => {
     const facturas = DataService.getFacturasFiltered(filterState);
-    const companyConfig = State.get('companyConfig') || { name: 'Guevara Cabinet', logoUrl: 'logo.png' };
+    const companyConfig = State.get('companyConfig') || { name: 'Guevara Cabinet', logoUrl: '' };
 
     let totalPagosUSD = 0;
     let totalPagosNIO = 0;

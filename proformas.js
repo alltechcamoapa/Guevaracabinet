@@ -596,14 +596,13 @@ const ProformasModule = (() => {
     const totalValue = parseFloat(proforma.total) || 0;
     const proformaNumero = proforma.numero || proforma.numero_proforma || '';
 
-    const companyConfig = State.get('companyConfig') || { name: 'ALLTECH', logoUrl: 'logo.png' };
+    const companyConfig = State.get('companyConfig') || { name: 'ALLTECH', logoUrl: '' };
     const content = `
       <div class="header">
         <div class="company-info">
           ${companyConfig.logoUrl ? `<img src="${companyConfig.logoUrl}" alt="Logo" style="max-height: 85px; margin-bottom: 5px;">` : ''}
           <h1>${companyConfig.name}</h1>
-          <p>Soluciones en Tecnología</p>
-          <p>Cel: 8566-0660</p>
+          <p>Cel: 8655-0650</p>
         </div>
         <div class="proforma-info">
           <h2>PROFORMA</h2>
@@ -694,7 +693,7 @@ const ProformasModule = (() => {
 
     const totalValor = proformas.reduce((sum, p) => sum + (parseFloat(p.total) || 0), 0);
 
-    const companyConfig = State.get('companyConfig') || { name: 'ALLTECH', logoUrl: 'logo.png' };
+    const companyConfig = State.get('companyConfig') || { name: 'ALLTECH', logoUrl: '' };
     const content = `
       <div class="header">
         ${companyConfig.logoUrl ? `<img src="${companyConfig.logoUrl}" alt="Logo" style="max-height: 85px; margin-bottom: 10px;">` : ''}
@@ -773,7 +772,7 @@ const ProformasModule = (() => {
 
     const totalValor = proformas.reduce((sum, p) => sum + (parseFloat(p.total) || 0), 0);
 
-    const companyConfig = State.get('companyConfig') || { name: 'ALLTECH', logoUrl: 'logo.png' };
+    const companyConfig = State.get('companyConfig') || { name: 'ALLTECH', logoUrl: '' };
     const content = `
       <div class="header">
         ${companyConfig.logoUrl ? `<img src="${companyConfig.logoUrl}" alt="Logo" style="max-height: 85px; margin-bottom: 10px;">` : ''}
