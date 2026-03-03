@@ -25,7 +25,7 @@ const DataService = (() => {
     // Clientes
     const getClientesFiltered = (filter) => {
         let res = memoryDb.clientes;
-        if (filter.search) res = res.filter(c => c.nombreCliente.toLowerCase().includes(filter.search.toLowerCase()) || (c.empresa && c.empresa.toLowerCase().includes(filter.search.toLowerCase())));
+        if (filter.search) res = res.filter(c => c.nombreCliente.toLowerCase().includes(filter.search.toLowerCase()));
         if (filter.status !== 'all') res = res.filter(c => c.estado === filter.status);
         return res;
     };
@@ -107,7 +107,16 @@ const DataService = (() => {
     // Proformas
     const getProformasFiltered = (filter) => {
         let res = memoryDb.proformas;
-        if (filter.search) res = res.filter(p => (p.numero && p.numero.toString().includes(filter.search)) || (p.numero_proforma && p.numero_proforma.toString().includes(filter.search)));
+        if (filter.search) {
+            const term = filter.search.toLowerCase();
+            res = res.filter(p => {
+                const cliente = getClienteById(p.clienteId || p.cliente_id);
+                const nombreCliente = cliente ? cliente.nombreCliente.toLowerCase() : '';
+                return (p.numero && p.numero.toString().includes(filter.search)) ||
+                    (p.numero_proforma && p.numero_proforma.toString().includes(filter.search)) ||
+                    nombreCliente.includes(term);
+            });
+        }
         if (filter.clienteId !== 'all') res = res.filter(p => p.clienteId === filter.clienteId || p.cliente_id === filter.clienteId);
         if (filter.estado !== 'all') res = res.filter(p => p.estado === filter.estado);
         return res;
@@ -237,7 +246,15 @@ const DataService = (() => {
     // Facturas
     const getFacturasFiltered = (filter) => {
         let res = memoryDb.facturas;
-        if (filter.search) res = res.filter(f => (f.numero && f.numero.toString().includes(filter.search)));
+        if (filter.search) {
+            const term = filter.search.toLowerCase();
+            res = res.filter(f => {
+                const cliente = getClienteById(f.clienteId);
+                const nombreCliente = cliente ? cliente.nombreCliente.toLowerCase() : '';
+                return (f.numero && f.numero.toString().includes(filter.search)) ||
+                    nombreCliente.includes(term);
+            });
+        }
         if (filter.clienteId !== 'all') res = res.filter(f => f.clienteId === filter.clienteId);
         if (filter.estado !== 'all') res = res.filter(f => f.estado === filter.estado);
         return res;

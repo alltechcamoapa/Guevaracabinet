@@ -1,6 +1,6 @@
 {
-  "name": "Guevara Cabinet",
-  "short_name": "Guevara",
+  "name": "Guevara's Cabinet",
+  "short_name": "Guevara's",
   "description": "Aplicación de gestión de clientes, productos y proformas",
   "start_url": "./index.html",
   "display": "standalone",

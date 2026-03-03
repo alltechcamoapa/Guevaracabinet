@@ -157,7 +157,7 @@ const ProductosModule = (() => {
     const codigoActual = producto?.codigo || DataService.getNextProductoCode(defaultTipo);
 
     return `
-      <div class="modal-overlay open" onclick="ProductosModule.closeModal(event)">
+      <div class="modal-overlay open">
         <div class="modal" onclick="event.stopPropagation()">
           <div class="modal__header">
             <h3 class="modal__title">${isEdit ? 'Editar Item' : 'Nuevo Producto / Servicio'}</h3>

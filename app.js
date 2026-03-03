@@ -21,7 +21,9 @@ const Icons = {
 const State = (() => {
   let state = {
     user: { role: 'admin' },
-    companyConfig: { name: 'Guevara Cabinet', logoUrl: '' },
+    companyConfig: {
+      name: "GUEVARA'S CABINET", logoUrl: ''
+    },
     currentModule: 'clientes'
   };
 
@@ -39,27 +41,36 @@ window.generatePDFTemplate = (title, content) => {
       <head>
         <title>${title}</title>
         <style>
-          body { font-family: 'Helvetica', 'Arial', sans-serif; padding: 40px; color: #333; }
-          .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 20px; }
-          .header h1 { color: #1e293b; margin: 0 0 10px 0; }
-          .header p { margin: 0; color: #64748b; }
-          .section { margin-bottom: 30px; }
-          .section-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 10px; color: #3b82f6; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-          th, td { border: 1px solid #e2e8f0; padding: 10px; text-align: left; }
-          th { background: #f8fafc; color: #475569; }
-          .totals { margin-top: 20px; width: 300px; float: right; padding-bottom: 30px;}
-          .totals-row { display: flex; justify-content: space-between; padding: 5px 0; }
-          .totals-row--total { font-weight: bold; font-size: 1.2rem; border-top: 2px solid #cbd5e1; padding-top: 10px; margin-top: 10px; }
-          .validity-notice { clear: both; margin-top: 50px; font-size: 0.9rem; color: #64748b; text-align: center; font-style: italic; }
-          .client-info p { margin: 5px 0; }
-          .proforma-info { display: flex; justify-content: space-between; font-size: 0.9rem;}
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+          body { font-family: 'Inter', 'Helvetica Neue', 'Arial', sans-serif; padding: 25px; color: #334155; font-size: 11px; line-height: 1.4; background-color: #fff; }
+          .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; text-align: left; }
+          .header h1 { color: #0f172a; margin: 0 0 4px 0; font-size: 18px; font-weight: 800; letter-spacing: -0.5px; text-transform: uppercase; }
+          .header p { margin: 0; color: #64748b; font-size: 10px; }
+          .company-info { flex: 1; }
+          .proforma-info { text-align: right; }
+          .proforma-info h2 { margin: 0 0 8px 0; color: #2563eb; font-size: 20px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; }
+          .proforma-info p { margin: 2px 0; color: #475569; font-size: 10px; }
+          .proforma-info strong { color: #1e293b; }
+          .section { margin-bottom: 20px; }
+          .section-title { font-size: 11px; font-weight: 700; margin-bottom: 8px; color: #2563eb; text-transform: uppercase; letter-spacing: 0.5px; }
+          table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; font-size: 10px; border-radius: 6px; overflow: hidden; border: 1px solid #e2e8f0; }
+          th, td { padding: 8px 10px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+          th { background: #f8fafc; color: #475569; font-weight: 600; text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; }
+          tr:last-child td { border-bottom: none; }
+          tr:nth-child(even) td { background-color: #f8fafc; }
+          .totals { margin-top: 15px; width: 220px; float: right; padding-bottom: 20px;}
+          .totals-row { display: flex; justify-content: space-between; padding: 4px 10px; }
+          .totals-row--total { font-weight: 800; font-size: 14px; background-color: #2563eb; color: #fff; border-radius: 6px; padding: 8px 10px; margin-top: 8px; }
+          .validity-notice { clear: both; margin-top: 40px; font-size: 9px; color: #94a3b8; text-align: center; }
+          .client-info { background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; }
+          .client-info p { margin: 3px 0; color: #334155; }
+          .client-info strong { color: #0f172a; font-size: 12px; }
           
           /* Utility Classes used by proformas.html generator */
-          .info-grid { display: flex; gap: 20px; }
-          .info-item { background: #f8fafc; padding: 15px; border-radius: 8px; flex: 1; border: 1px solid #e2e8f0;}
-          .info-label { font-size: 0.8rem; color: #64748b; text-transform: uppercase; }
-          .info-value { font-size: 1.2rem; font-weight: bold; color: #0f172a; margin-top: 5px;}
+          .info-grid { display: flex; gap: 15px; }
+          .info-item { background: #f8fafc; padding: 12px; border-radius: 8px; flex: 1; border: 1px solid #e2e8f0; text-align: center; }
+          .info-label { font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;}
+          .info-value { font-size: 1.25rem; font-weight: 800; color: #2563eb; }
         </style>
       </head>
       <body>
@@ -98,10 +109,11 @@ window.exportAndSharePDF = async (title, contentHTML) => {
       const filename = `${sanitizedTitle}.pdf`;
 
       const pdfBlob = await html2pdf().set({
-        margin: [10, 10, 10, 10],
+        margin: [5, 5, 5, 5],
         filename: filename,
         image: { type: 'jpeg', quality: 0.98 },
         html2canvas: { scale: 2, useCORS: true },
+        pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       }).from(container).output('blob');
 
@@ -181,7 +193,9 @@ const App = (() => {
       console.log('Could not convert logo to base64: ', e);
     }
 
-    State.set('companyConfig', { name: 'Guevara Cabinet', logoUrl: finalLogoUrl });
+    State.set('companyConfig', {
+      name: "GUEVARA'S CABINET", logoUrl: finalLogoUrl
+    });
     applyTheme(config.theme || 'dark');
 
     // 3. Setup Events
@@ -235,7 +249,25 @@ const App = (() => {
   };
 
   const refreshCurrentModule = () => {
+    const activeEl = document.activeElement;
+    const isInput = activeEl && activeEl.tagName === 'INPUT' && activeEl.type === 'text';
+    const selectionStart = isInput ? activeEl.selectionStart : null;
+    const placeholder = isInput ? activeEl.getAttribute('placeholder') : null;
+
     navigate(State.get('currentModule'));
+
+    if (isInput && placeholder) {
+      setTimeout(() => {
+        const inputs = document.querySelectorAll('input[type="text"]');
+        for (const input of inputs) {
+          if (input.getAttribute('placeholder') === placeholder) {
+            input.focus();
+            try { input.setSelectionRange(selectionStart, selectionStart); } catch (e) { }
+            break;
+          }
+        }
+      }, 0);
+    }
   };
 
   const setupMobileTables = () => {
@@ -320,7 +352,7 @@ const App = (() => {
     const sidebarHtml = `
       <div class="sidebar__header" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 20px 10px;">
         <img src="./logo.png" alt="Logo" style="height: 120px; max-width: 100%; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));" onerror="this.style.display='none'">
-        <h1 class="sidebar__title" style="text-align: center; font-size: 1.25rem;">Guevara Cabinet</h1>
+        <h1 class="sidebar__title" style="text-align: center; font-size: 1.25rem;">Guevara's Cabinet</h1>
       </div>
       <nav class="nav-menu">
         <a href="#" class="nav-item active" data-module="clientes">

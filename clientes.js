@@ -77,7 +77,7 @@ const ClientesModule = (() => {
         <thead class="data-table__head">
           <tr>
             <th>Cliente</th>
-            <th>Empresa</th>
+
             <th>Teléfono</th>
             <th>Correo</th>
             <th>Estado</th>
@@ -99,7 +99,7 @@ const ClientesModule = (() => {
                   </div>
                 </div>
               </td>
-              <td data-label="Empresa">${cliente.empresa}</td>
+
               <td data-label="Teléfono">${cliente.telefono}</td>
               <td data-label="Correo">${cliente.correo}</td>
               <td data-label="Estado">
@@ -164,7 +164,7 @@ const ClientesModule = (() => {
     const title = isEdit ? 'Editar Cliente' : 'Nuevo Cliente';
 
     return `
-      <div class="modal-overlay open" onclick="ClientesModule.closeModal(event)">
+      <div class="modal-overlay open">
         <div class="modal" onclick="event.stopPropagation()">
           <div class="modal__header">
             <h3 class="modal__title">${title}</h3>
@@ -184,14 +184,6 @@ const ClientesModule = (() => {
                        value="${cliente?.nombreCliente || ''}"
                        placeholder="Ej: Juan Pérez"
                        required>
-              </div>
-              <div class="form-group">
-                <label class="form-label">Empresa</label>
-                <input type="text" 
-                       name="empresa" 
-                       class="form-input" 
-                       value="${cliente?.empresa || ''}"
-                       placeholder="Ej: Mi Empresa S.A.">
               </div>
             </div>
 
@@ -252,7 +244,7 @@ const ClientesModule = (() => {
     const proformas = DataService.getProformasByCliente(uuid);
 
     return `
-      <div class="modal-overlay open" onclick="ClientesModule.closeModal(event)">
+      <div class="modal-overlay open">
         <div class="modal modal--lg" onclick="event.stopPropagation()">
           <div class="modal__header">
             <div class="flex items-center gap-md">
@@ -262,7 +254,7 @@ const ClientesModule = (() => {
               </div>
               <div>
                 <h3 class="modal__title">${cliente.nombreCliente}</h3>
-                <p class="text-sm text-muted">${cliente.empresa}</p>
+
               </div>
             </div>
             <button class="modal__close" onclick="ClientesModule.closeModal()">
@@ -415,7 +407,7 @@ const ClientesModule = (() => {
 
   const renderDeleteConfirm = (cliente) => {
     return `
-      <div class="modal-overlay open" onclick="ClientesModule.closeModal(event)">
+      <div class="modal-overlay open">
         <div class="modal modal--confirm" onclick="event.stopPropagation()">
           <div class="modal__body" style="padding-top: var(--spacing-xl);">
             <div class="modal__icon modal__icon--danger">
@@ -455,16 +447,9 @@ const ClientesModule = (() => {
     event.preventDefault();
     const formData = new FormData(event.target);
     const rawData = Object.fromEntries(formData.entries());
-
-    // Auto-fill empresa with client name if left empty
-    if (!rawData.empresa || rawData.empresa.trim() === '') {
-      rawData.empresa = rawData.nombreCliente;
-    }
-
     // Mapear camelCase (UI)
     const data = {
       nombreCliente: rawData.nombreCliente,
-      empresa: rawData.empresa,
       telefono: rawData.telefono,
       correo: rawData.correo || null,
       direccion: rawData.direccion || null,

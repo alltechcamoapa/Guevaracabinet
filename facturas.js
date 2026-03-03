@@ -5,6 +5,8 @@
 
 const FacturasModule = (() => {
   let filterState = { search: '', clienteId: 'all', estado: 'all' };
+  let currentItems = [];
+  let currentFormCurrency = 'USD';
 
   // ========== RENDER FUNCTIONS ==========
 
@@ -24,7 +26,7 @@ const FacturasModule = (() => {
               ${Icons.barChart} Reporte Creadas
             </button>
             <button class="btn btn--secondary" onclick="FacturasModule.generateReportePagos()">
-              ${Icons.barChart} Reporte Pagos
+              ${Icons.barChart} Reporte Abonos
             </button>
           </div>
         </div>
@@ -49,7 +51,7 @@ const FacturasModule = (() => {
                 <option value="all">Todos los clientes</option>
                 ${clientes.map(c => `
                   <option value="${c.id}" ${filterState.clienteId === c.id ? 'selected' : ''}>
-                    ${c.empresa}
+                    ${c.nombreCliente}
                   </option>
                 `).join('')}
               </select>
@@ -57,21 +59,21 @@ const FacturasModule = (() => {
           </div>
         </div>
 
-        <!-- Facturas Table -->
-        <div class="card">
-          <div class="card__body" style="padding: 0;">
-            ${facturas.length > 0 ? renderTable(facturas) : renderEmptyState()}
-          </div>
-        </div>
+        <!--Facturas Table-->
+  <div class="card">
+    <div class="card__body" style="padding: 0;">
+      ${facturas.length > 0 ? renderTable(facturas) : renderEmptyState()}
+    </div>
+  </div>
       </div>
-      <div id="facturaModal"></div>
-    `;
+  <div id="facturaModal"></div>
+`;
   };
 
   const renderStats = () => {
     const stats = DataService.getFacturasStats();
     return `
-      <div class="stat-card stat-card--success">
+  <div class="stat-card stat-card--success">
         <div class="stat-card__icon">${Icons.checkCircle}</div>
         <span class="stat-card__label">Total Facturas</span>
         <span class="stat-card__value">${stats.total}</span>
@@ -86,7 +88,7 @@ const FacturasModule = (() => {
         <span class="stat-card__label">Saldo Pendiente a Cobrar</span>
         <span class="stat-card__value text-warning">$${(stats.saldoPendienteTotal || 0).toFixed(2)}</span>
       </div>
-    `;
+`;
   };
 
   const renderTable = (facturas) => {
@@ -94,7 +96,7 @@ const FacturasModule = (() => {
     const canDelete = DataService.canPerformAction(user.role, 'facturas', 'delete');
 
     return `
-      <table class="data-table">
+  <table class="data-table">
         <thead class="data-table__head">
           <tr>
             <th>Nº Factura</th>
@@ -115,8 +117,7 @@ const FacturasModule = (() => {
               <tr>
                 <td data-label="Nº Factura"><span class="font-medium">FAC-${String(factura.numero).padStart(4, '0')}</span></td>
                 <td data-label="Cliente">
-                  <div class="font-medium">${cliente?.empresa || 'N/A'}</div>
-                  <div class="text-xs text-muted">${cliente?.nombreCliente || ''}</div>
+                  <div class="font-medium">${cliente?.nombreCliente || 'N/A'}</div>
                 </td>
                 <td data-label="Fecha">
                   <div>${factura.fecha ? new Date(factura.fecha).toLocaleDateString('es-NI') : '-'}</div>
@@ -143,6 +144,7 @@ const FacturasModule = (() => {
                         ${Icons.wallet}
                       </button>
                     ` : ''}
+
                     <button class="btn btn--ghost btn--icon btn--sm" onclick="FacturasModule.generatePDF('${factura.facturaId}')" title="Imprimir PDF">
                       ${Icons.fileText}
                     </button>
@@ -158,12 +160,12 @@ const FacturasModule = (() => {
     }).join('')}
         </tbody>
       </table>
-    `;
+  `;
   };
 
   const renderEmptyState = () => {
     return `
-      <div class="empty-state">
+  <div class="empty-state">
         <div class="empty-state__icon">${Icons.fileText}</div>
         <h3 class="empty-state__title">No hay facturas</h3>
         <p class="empty-state__description">Aprueba proformas para generar facturas automáticamente.</p>
@@ -171,7 +173,7 @@ const FacturasModule = (() => {
           Ir a Proformas
         </button>
       </div>
-    `;
+  `;
   };
 
   const renderDetailModal = (factura) => {
@@ -180,58 +182,55 @@ const FacturasModule = (() => {
     const totalValue = parseFloat(factura.total) || 0;
 
     return `
-      <div class="modal-overlay open" onclick="FacturasModule.closeModal(event)">
-        <div class="modal modal--lg" onclick="event.stopPropagation()">
-          <div class="modal__header">
-            <div>
-              <h3 class="modal__title">Factura FAC-${String(factura.numero).padStart(4, '0')}</h3>
-              <p class="text-sm text-muted">ID: ${factura.facturaId}</p>
-            </div>
-            <button class="modal__close" onclick="FacturasModule.closeModal()">${Icons.x}</button>
+  <div class="modal-overlay open">
+    <div class="modal modal--lg" onclick="event.stopPropagation()">
+      <div class="modal__header">
+        <div>
+          <h3 class="modal__title">Factura FAC-${String(factura.numero).padStart(4, '0')}</h3>
+          <p class="text-sm text-muted">ID: ${factura.facturaId}</p>
+        </div>
+        <button class="modal__close" onclick="FacturasModule.closeModal()">${Icons.x}</button>
+      </div>
+      <div class="modal__body">
+        <div class="detail-grid">
+          <div class="detail-item">
+            <div class="detail-item__label">Cliente</div>
+            <div class="detail-item__value">${cliente?.nombreCliente || 'N/A'}</div>
           </div>
-          <div class="modal__body">
-            <div class="detail-grid">
-              <div class="detail-item">
-                <div class="detail-item__label">Cliente</div>
-                <div class="detail-item__value">${cliente?.nombreCliente || 'N/A'}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-item__label">Empresa</div>
-                <div class="detail-item__value">${cliente?.empresa || 'N/A'}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-item__label">Fecha</div>
-                <div class="detail-item__value">${new Date(factura.fecha).toLocaleString('es-NI')}</div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-item__label">Forma de Pago</div>
-                <div class="detail-item__value"><span class="badge badge--info">${factura.formaPago}</span></div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-item__label">Estado</div>
-                <div class="detail-item__value">
-                  <span class="badge ${factura.estado === 'Crédito' ? 'badge--warning' : 'badge--success'}">${factura.estado}</span>
-                </div>
-              </div>
-              <div class="detail-item">
-                <div class="detail-item__label">Saldo Pendiente</div>
-                <div class="detail-item__value font-medium text-danger">${factura.moneda === 'USD' ? '$' : 'C$'}${(parseFloat(factura.saldoPendiente) || 0).toFixed(2)}</div>
-              </div>
+
+          <div class="detail-item">
+            <div class="detail-item__label">Fecha</div>
+            <div class="detail-item__value">${new Date(factura.fecha).toLocaleString('es-NI')}</div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-item__label">Forma de Pago</div>
+            <div class="detail-item__value"><span class="badge badge--info">${factura.formaPago}</span></div>
+          </div>
+          <div class="detail-item">
+            <div class="detail-item__label">Estado</div>
+            <div class="detail-item__value">
+              <span class="badge ${factura.estado === 'Crédito' ? 'badge--warning' : 'badge--success'}">${factura.estado}</span>
             </div>
-            
-            <div style="margin-top: var(--spacing-lg);">
-              <h4 style="margin-bottom: var(--spacing-sm); color: var(--text-primary);">Detalle de Items</h4>
-              <table class="data-table">
-                <thead class="data-table__head">
-                  <tr>
-                    <th>Cantidad</th>
-                    <th>Descripción</th>
-                    <th>P. Unitario</th>
-                    <th>Total</th>
-                  </tr>
-                </thead>
-                <tbody class="data-table__body">
-                  ${factura.items.map(item => `
+          </div>
+          <div class="detail-item">
+            <div class="detail-item__label">Saldo Pendiente</div>
+            <div class="detail-item__value font-medium text-danger">${factura.moneda === 'USD' ? '$' : 'C$'}${(parseFloat(factura.saldoPendiente) || 0).toFixed(2)}</div>
+          </div>
+        </div>
+
+        <div style="margin-top: var(--spacing-lg);">
+          <h4 style="margin-bottom: var(--spacing-sm); color: var(--text-primary);">Detalle de Items</h4>
+          <table class="data-table">
+            <thead class="data-table__head">
+              <tr>
+                <th>Cantidad</th>
+                <th>Descripción</th>
+                <th>P. Unitario</th>
+                <th>Total</th>
+              </tr>
+            </thead>
+            <tbody class="data-table__body">
+              ${factura.items.map(item => `
                     <tr>
                       <td>${item.cantidad}</td>
                       <td>${item.descripcion}</td>
@@ -239,22 +238,22 @@ const FacturasModule = (() => {
                       <td class="font-medium">${factura.moneda === 'USD' ? '$' : 'C$'}${(parseFloat(item.total) || 0).toFixed(2)}</td>
                     </tr>
                   `).join('')}
-                </tbody>
-              </table>
-            </div>
+            </tbody>
+          </table>
+        </div>
 
-            <div class="proforma-totals" style="margin-top: var(--spacing-md);">
-              <div class="proforma-totals__row">
-                <span>Subtotal:</span>
-                <span>${factura.moneda === 'USD' ? '$' : 'C$'}${subtotalValue.toFixed(2)}</span>
-              </div>
-              <div class="proforma-totals__row proforma-totals__row--total">
-                <span>Total:</span>
-                <span>${factura.moneda === 'USD' ? '$' : 'C$'}${totalValue.toFixed(2)}</span>
-              </div>
-            </div>
+        <div class="proforma-totals" style="margin-top: var(--spacing-md);">
+          <div class="proforma-totals__row">
+            <span>Subtotal:</span>
+            <span>${factura.moneda === 'USD' ? '$' : 'C$'}${subtotalValue.toFixed(2)}</span>
+          </div>
+          <div class="proforma-totals__row proforma-totals__row--total">
+            <span>Total:</span>
+            <span>${factura.moneda === 'USD' ? '$' : 'C$'}${totalValue.toFixed(2)}</span>
+          </div>
+        </div>
 
-            ${(factura.historialAbonos && factura.historialAbonos.length > 0) ? `
+        ${(factura.historialAbonos && factura.historialAbonos.length > 0) ? `
              <div style="margin-top: var(--spacing-lg);">
               <h4 style="margin-bottom: var(--spacing-sm); color: var(--text-primary);">Historial de Abonos</h4>
               <table class="data-table">
@@ -264,29 +263,35 @@ const FacturasModule = (() => {
                     <th>Forma</th>
                     <th>Nota</th>
                     <th>Monto</th>
+                    <th>Comprobante</th>
                   </tr>
                 </thead>
                 <tbody class="data-table__body">
-                  ${factura.historialAbonos.map(abono => `
+                  ${factura.historialAbonos.map((abono, idx) => `
                     <tr>
                       <td>${new Date(abono.fecha).toLocaleString('es-NI')}</td>
                       <td>${abono.formaPago}</td>
                       <td>${abono.nota || '-'}</td>
                       <td class="font-medium text-success">+${factura.moneda === 'USD' ? '$' : 'C$'}${(parseFloat(abono.monto) || 0).toFixed(2)}</td>
+                      <td>
+                        <button class="btn btn--ghost btn--icon btn--sm" onclick="FacturasModule.generateComprobantePDF('${factura.facturaId}', ${idx})" title="Imprimir Comprobante">
+                          ${Icons.fileText}
+                        </button>
+                      </td>
                     </tr>
                   `).join('')}
                 </tbody>
               </table>
             </div>
             ` : ''}
-          </div>
-          <div class="modal__footer">
-            <button class="btn btn--secondary" onclick="FacturasModule.closeModal()">Cerrar</button>
-            <button class="btn btn--primary" onclick="FacturasModule.generatePDF('${factura.facturaId}')">${Icons.fileText} Imprimir / PDF</button>
-          </div>
-        </div>
       </div>
-    `;
+      <div class="modal__footer">
+        <button class="btn btn--secondary" onclick="FacturasModule.closeModal()">Cerrar</button>
+        <button class="btn btn--primary" onclick="FacturasModule.generatePDF('${factura.facturaId}')">${Icons.fileText} Imprimir / PDF</button>
+      </div>
+    </div>
+      </div>
+  `;
   };
 
   // ========== PDF GENERATION ==========
@@ -300,9 +305,9 @@ const FacturasModule = (() => {
     const subtotalValue = parseFloat(factura.subtotal) || 0;
     const totalValue = parseFloat(factura.total) || 0;
 
-    const companyConfig = State.get('companyConfig') || { name: 'Guevara Cabinet', logoUrl: '' };
+    const companyConfig = State.get('companyConfig') || { name: "GUEVARA'S CABINET", logoUrl: '' };
     const content = `
-      <div class="header">
+  <div class="header">
         <div class="company-info">
           ${companyConfig.logoUrl ? `<img src="${companyConfig.logoUrl}" alt="Logo" style="max-height: 85px; margin-bottom: 5px;">` : ''}
           <h1>${companyConfig.name}</h1>
@@ -317,14 +322,13 @@ const FacturasModule = (() => {
         </div>
       </div>
 
-      <div class="section">
-        <div class="section-title">Facturado a</div>
+  <div class="section">
+    <div class="section-title">Facturado a</div>
         <div class="client-info">
-          <p><strong>${cliente?.empresa || 'N/A'}</strong></p>
-          <p>${cliente?.nombreCliente || ''}</p>
+          <p><strong>${cliente?.nombreCliente || 'N/A'}</strong></p>
           <p>${cliente?.direccion || ''}</p>
-          <p>Tel: ${cliente?.telefono || ''}</p>
-        </div>
+    <p>Tel: ${cliente?.telefono || ''}</p>
+  </div>
       </div>
 
       <div class="section">
@@ -366,14 +370,14 @@ const FacturasModule = (() => {
         <p style="margin-top: 5px;">Firma de Recibido / Cancelado</p>
         <p style="margin-top: 20px;">¡Gracias por su compra en ${companyConfig.name}!</p>
       </div>
-    `;
+`;
 
-    window.exportAndSharePDF(`Factura_FAC-${factura.numero}`, content);
+    window.exportAndSharePDF(`Factura_FAC - ${factura.numero} `, content);
   };
 
   const generateReporteCreadas = () => {
     const facturas = DataService.getFacturasFiltered(filterState);
-    const companyConfig = State.get('companyConfig') || { name: 'Guevara Cabinet', logoUrl: '' };
+    const companyConfig = State.get('companyConfig') || { name: "GUEVARA'S CABINET", logoUrl: '' };
 
     let totalFacturadoUSD = 0;
     let totalFacturadoNIO = 0;
@@ -384,24 +388,24 @@ const FacturasModule = (() => {
       if (f.moneda === 'USD') totalFacturadoUSD += val; else totalFacturadoNIO += val;
 
       return `
-        <tr>
+  <tr>
           <td>FAC-${String(f.numero).padStart(4, '0')}</td>
           <td>${new Date(f.fecha).toLocaleDateString('es-NI')}</td>
-          <td>${cliente?.empresa || 'N/A'}</td>
+          <td>${cliente?.nombreCliente || 'N/A'}</td>
           <td>${f.estado}</td>
           <td style="text-align: right;">${f.moneda === 'USD' ? '$' : 'C$'}${val.toFixed(2)}</td>
         </tr>
-      `;
+  `;
     }).join('');
 
     const content = `
-      <div class="header">
-        <div class="company-info" style="text-align: center;">
-          ${companyConfig.logoUrl ? `<img src="${companyConfig.logoUrl}" alt="Logo" style="max-height: 60px; margin-bottom: 10px;">` : ''}
-          <h2>${companyConfig.name}</h2>
-          <h3>Reporte de Facturas Creadas</h3>
-          <p>Generado: ${new Date().toLocaleString('es-NI')}</p>
-        </div>
+  <div class="header">
+    <div class="company-info" style="text-align: center;">
+      ${companyConfig.logoUrl ? `<img src="${companyConfig.logoUrl}" alt="Logo" style="max-height: 60px; margin-bottom: 10px;">` : ''}
+      <h2>${companyConfig.name}</h2>
+      <h3>Reporte de Facturas Creadas</h3>
+      <p>Generado: ${new Date().toLocaleString('es-NI')}</p>
+    </div>
       </div>
       <div class="section">
         <table>
@@ -423,14 +427,14 @@ const FacturasModule = (() => {
         <p><strong>Total Facturado (USD):</strong> $${totalFacturadoUSD.toFixed(2)}</p>
         <p><strong>Total Facturado (NIO):</strong> C$${totalFacturadoNIO.toFixed(2)}</p>
       </div>
-    `;
+`;
 
     window.exportAndSharePDF('Reporte_Facturas_Creadas', content);
   };
 
   const generateReportePagos = () => {
     const facturas = DataService.getFacturasFiltered(filterState);
-    const companyConfig = State.get('companyConfig') || { name: 'Guevara Cabinet', logoUrl: '' };
+    const companyConfig = State.get('companyConfig') || { name: "GUEVARA'S CABINET", logoUrl: '' };
 
     let totalPagosUSD = 0;
     let totalPagosNIO = 0;
@@ -459,24 +463,24 @@ const FacturasModule = (() => {
       if (abono.moneda === 'USD') totalPagosUSD += val; else totalPagosNIO += val;
 
       return `
-        <tr>
+  <tr>
           <td>${new Date(abono.fecha).toLocaleString('es-NI')}</td>
           <td>FAC-${String(abono.facturaNumero).padStart(4, '0')}</td>
-          <td>${cliente?.empresa || 'N/A'}</td>
+          <td>${cliente?.nombreCliente || 'N/A'}</td>
           <td>${abono.formaPago}</td>
           <td style="text-align: right;">${abono.moneda === 'USD' ? '$' : 'C$'}${val.toFixed(2)}</td>
         </tr>
-      `;
+  `;
     }).join('');
 
     const content = `
-      <div class="header">
-        <div class="company-info" style="text-align: center;">
-          ${companyConfig.logoUrl ? `<img src="${companyConfig.logoUrl}" alt="Logo" style="max-height: 60px; margin-bottom: 10px;">` : ''}
-          <h2>${companyConfig.name}</h2>
-          <h3>Reporte de Pagos de Facturas (Abonos)</h3>
-          <p>Generado: ${new Date().toLocaleString('es-NI')}</p>
-        </div>
+  <div class="header">
+    <div class="company-info" style="text-align: center;">
+      ${companyConfig.logoUrl ? `<img src="${companyConfig.logoUrl}" alt="Logo" style="max-height: 60px; margin-bottom: 10px;">` : ''}
+      <h2>${companyConfig.name}</h2>
+      <h3>Reporte de Abonos Realizados</h3>
+      <p>Generado: ${new Date().toLocaleString('es-NI')}</p>
+    </div>
       </div>
       <div class="section">
         <table>
@@ -498,7 +502,7 @@ const FacturasModule = (() => {
         <p><strong>Total Recaudado (USD):</strong> $${totalPagosUSD.toFixed(2)}</p>
         <p><strong>Total Recaudado (NIO):</strong> C$${totalPagosNIO.toFixed(2)}</p>
       </div>
-    `;
+`;
 
     window.exportAndSharePDF('Reporte_Pagos_Abonos', content);
   };
@@ -532,44 +536,44 @@ const FacturasModule = (() => {
     const maxAbono = parseFloat(factura.saldoPendiente) || 0;
 
     const content = `
-          <div class="modal-overlay open" onclick="FacturasModule.closeModal(event)">
-            <div class="modal" onclick="event.stopPropagation()">
-              <div class="modal__header">
-                <h3 class="modal__title">${Icons.wallet} Aplicar Abono a FAC-${String(factura.numero).padStart(4, '0')}</h3>
-                <button class="modal__close" onclick="FacturasModule.closeModal()">${Icons.x}</button>
-              </div>
-              <div class="modal__body">
-                <div class="alert alert--info" style="margin-bottom: var(--spacing-md); padding: 10px; background: rgba(14,165,233,0.1); border-radius: 8px;">
-                    Saldo Pendiente: <strong>${divisa}${maxAbono.toFixed(2)}</strong>
-                </div>
-                
-                <div class="form-group">
-                  <label class="form-label form-label--required">Monto a Abonar (${divisa})</label>
-                  <input type="number" id="abonoMontoInput" class="form-input" value="${maxAbono.toFixed(2)}" step="0.01" min="0.01" max="${maxAbono}">
-                </div>
+  <div class="modal-overlay open">
+    <div class="modal" onclick="event.stopPropagation()">
+      <div class="modal__header">
+        <h3 class="modal__title">${Icons.wallet} Aplicar Abono a FAC-${String(factura.numero).padStart(4, '0')}</h3>
+        <button class="modal__close" onclick="FacturasModule.closeModal()">${Icons.x}</button>
+      </div>
+      <div class="modal__body">
+        <div class="alert alert--info" style="margin-bottom: var(--spacing-md); padding: 10px; background: rgba(14,165,233,0.1); border-radius: 8px;">
+          Saldo Pendiente: <strong>${divisa}${maxAbono.toFixed(2)}</strong>
+        </div>
 
-                <div class="form-group">
-                  <label class="form-label form-label--required">Forma de Pago</label>
-                  <select id="abonoFormaPagoSelect" class="form-select">
-                    <option value="Efectivo">Efectivo</option>
-                    <option value="Transferencia">Transferencia Bancaria</option>
-                    <option value="Tarjeta">Tarjeta (Crédito/Débito)</option>
-                    <option value="Cheque">Cheque</option>
-                  </select>
-                </div>
+        <div class="form-group">
+          <label class="form-label form-label--required">Monto a Abonar (${divisa})</label>
+          <input type="number" id="abonoMontoInput" class="form-input" value="${maxAbono.toFixed(2)}" step="0.01" min="0.01" max="${maxAbono}">
+        </div>
 
-                <div class="form-group">
-                    <label class="form-label">Nota o Referencia</label>
-                    <input type="text" id="abonoNotaInput" class="form-input" placeholder="Opcional. Ej. Depósito Ref 123">
-                </div>
-              </div>
-              <div class="modal__footer">
-                <button class="btn btn--secondary" onclick="FacturasModule.closeModal()">Cancelar</button>
-                <button class="btn btn--success" onclick="FacturasModule.submitAbono('${facturaId}')">Registrar Abono</button>
-              </div>
-            </div>
+        <div class="form-group">
+          <label class="form-label form-label--required">Forma de Pago</label>
+          <select id="abonoFormaPagoSelect" class="form-select">
+            <option value="Efectivo">Efectivo</option>
+            <option value="Transferencia">Transferencia Bancaria</option>
+            <option value="Tarjeta">Tarjeta (Crédito/Débito)</option>
+            <option value="Cheque">Cheque</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Nota o Referencia</label>
+          <input type="text" id="abonoNotaInput" class="form-input" placeholder="Opcional. Ej. Depósito Ref 123">
+        </div>
+      </div>
+      <div class="modal__footer">
+        <button class="btn btn--secondary" onclick="FacturasModule.closeModal()">Cancelar</button>
+        <button class="btn btn--success" onclick="FacturasModule.submitAbono('${facturaId}')">Registrar Abono</button>
+      </div>
+    </div>
           </div>
-        `;
+  `;
     document.getElementById('facturaModal').innerHTML = content;
   };
 
@@ -586,6 +590,168 @@ const FacturasModule = (() => {
     } catch (error) {
       alert('Error al aplicar abono: ' + error.message);
     }
+  };
+
+  const renderItemsEditor = () => {
+    const symbol = currentFormCurrency === 'USD' ? '$' : 'C$';
+    return currentItems.map((item, index) => `
+  <div class="proforma-item" data-index="${index}">
+        <div class="proforma-item__row">
+          <input type="number" class="form-input proforma-item__qty" 
+                 value="${item.cantidad}" min="1" step="1"
+                 placeholder="Cant."
+                 onchange="FacturasModule.updateItem(${index}, 'cantidad', this.value)">
+          <input type="text" class="form-input proforma-item__desc" 
+                 value="${item.descripcion}" 
+                 placeholder="Descripción del producto o servicio"
+                 onchange="FacturasModule.updateItem(${index}, 'descripcion', this.value)">
+          <input type="number" class="form-input proforma-item__price" 
+                 value="${item.precioUnitario || item.precio_unitario || 0}" min="0" step="0.01"
+                 placeholder="Precio Unit."
+                 onchange="FacturasModule.updateItem(${index}, 'precioUnitario', this.value)">
+          <span class="proforma-item__total">${symbol}${(parseFloat(item.total) || 0).toFixed(2)}</span>
+          ${currentItems.length > 1 ? `
+            <button type="button" class="btn btn--ghost btn--icon btn--sm text-danger" onclick="FacturasModule.removeItem(${index})">
+              ${Icons.trash}
+            </button>
+          ` : ''}
+        </div>
+      </div>
+    `).join('');
+  };
+
+  const addItem = () => {
+    currentItems.push({ cantidad: 1, descripcion: '', precioUnitario: 0, total: 0 });
+    document.getElementById('facturaItemsEditor').innerHTML = renderItemsEditor();
+  };
+
+  const removeItem = (index) => {
+    if (currentItems.length > 1) {
+      currentItems.splice(index, 1);
+      document.getElementById('facturaItemsEditor').innerHTML = renderItemsEditor();
+      calculateTotals();
+    }
+  };
+
+  const updateItem = (index, field, value) => {
+    if (field === 'cantidad' || field === 'precioUnitario') {
+      currentItems[index][field] = parseFloat(value) || 0;
+      let pV = currentItems[index].precioUnitario;
+      if (pV === undefined) pV = currentItems[index].precio_unitario || 0;
+      currentItems[index].total = currentItems[index].cantidad * pV;
+    } else {
+      currentItems[index][field] = value;
+    }
+    document.getElementById('facturaItemsEditor').innerHTML = renderItemsEditor();
+    calculateTotals();
+  };
+
+  const calculateTotals = () => {
+    const symbol = currentFormCurrency === 'USD' ? '$' : 'C$';
+    const subtotal = currentItems.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+    document.getElementById('facturaSubtotal').textContent = `${symbol}${subtotal.toFixed(2)}`;
+    document.getElementById('facturaTotal').textContent = `${symbol}${subtotal.toFixed(2)}`;
+  };
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const data = Object.fromEntries(formData.entries());
+
+    const subtotal = currentItems.reduce((sum, item) => sum + (parseFloat(item.total) || 0), 0);
+
+    // Preparar objeto para actualización
+    const facturaUpdate = {
+      clienteId: data.clienteId,
+      fecha: data.fecha,
+      formaPago: data.formaPago,
+      estado: data.estado,
+      items: currentItems,
+      subtotal: subtotal,
+      total: subtotal
+    };
+
+    try {
+      if (data.facturaId) {
+        await DataService.updateFactura(data.facturaId, facturaUpdate);
+        if (App && App.showNotification) App.showNotification('Factura actualizada correctamente', 'success');
+      }
+      closeModal();
+      if (App && App.refreshCurrentModule) App.refreshCurrentModule();
+    } catch (err) {
+      alert('Error updating factura: ' + err.message);
+    }
+  };
+
+  const generateComprobantePDF = (facturaId, abonoIndex) => {
+    const factura = DataService.getFacturaById(facturaId);
+    if (!factura || !factura.historialAbonos || !factura.historialAbonos[abonoIndex]) return;
+
+    const abono = factura.historialAbonos[abonoIndex];
+    const cliente = DataService.getClienteById(factura.clienteId);
+    const simbolo = factura.moneda === 'USD' ? '$' : 'C$';
+    const companyConfig = State.get('companyConfig') || { name: "GUEVARA'S CABINET", logoUrl: '' };
+
+    const content = `
+      <div class="header">
+        <div class="company-info">
+          ${companyConfig.logoUrl ? `<img src="${companyConfig.logoUrl}" alt="Logo" style="max-height: 85px; margin-bottom: 5px;">` : ''}
+          <h1>${companyConfig.name}</h1>
+          <p>Comprobante de Pago</p>
+          <p>Cel: 8655-0650</p>
+        </div>
+        <div class="proforma-info">
+          <h2>RECIBO</h2>
+          <p><strong>Factura Nº:</strong> FAC-${String(factura.numero).padStart(4, '0')}</p>
+          <p><strong>Fecha Pago:</strong> ${new Date(abono.fecha).toLocaleDateString('es-NI')}</p>
+          <p><strong>Forma de Pago:</strong> ${abono.formaPago}</p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Recibí de:</div>
+        <div class="client-info">
+          <p><strong>${cliente?.nombreCliente || 'N/A'}</strong></p>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Detalle del Abono</div>
+        <table>
+          <thead>
+            <tr>
+              <th>Concepto</th>
+              <th style="width: 150px; text-align: right;">Monto</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Abono a factura FAC-${String(factura.numero).padStart(4, '0')} ${abono.nota ? '(' + abono.nota + ')' : ''}</td>
+              <td style="text-align: right;">${simbolo}${(parseFloat(abono.monto) || 0).toFixed(2)}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="totals">
+        <div class="totals-row totals-row--total">
+          <span>TOTAL RECIBIDO:</span>
+          <span>${simbolo}${(parseFloat(abono.monto) || 0).toFixed(2)}</span>
+        </div>
+        <div class="totals-row">
+          <span>Saldo Restante:</span>
+          <span>${simbolo}${(parseFloat(factura.saldoPendiente) || 0).toFixed(2)}</span>
+        </div>
+      </div>
+
+      <div class="validity-notice" style="background: transparent; border:none; text-align: center; margin-top: 80px;">
+        <p>___________________________________</p>
+        <p style="margin-top: 5px;">Firma de Recibido</p>
+        <p style="margin-top: 20px;">¡Gracias por su pago!</p>
+      </div>
+`;
+
+    window.exportAndSharePDF(`Comprobante_FAC - ${factura.numero}_${new Date(abono.fecha).getTime()} `, content);
   };
 
   const closeModal = (event) => {
@@ -605,6 +771,12 @@ const FacturasModule = (() => {
     deleteFactura,
     generatePDF,
     generateReporteCreadas,
-    generateReportePagos
+    generateReportePagos,
+    
+    handleSubmit,
+    addItem,
+    removeItem,
+    updateItem,
+    generateComprobantePDF
   };
 })();
